@@ -1,0 +1,19 @@
+[MQTT]
+broker = 192.168.1.10
+username = my_mqtt_user
+password = myMqttP455w0rd
+topic_command = my/coopdoor/topic
+topic_state = my/coopdoor/state/topic
+
+[COOP_LIGHT_LOGGING]
+logfile = /var/log/coop/coop.log
+level = INFO
+message_format: %(asctime)s: %(message)s
+date_time_format: %Y-%m-%d %H:%M:%S
+
+[COOP_LIGHT]
+dim_pin = 12
+dusk_endurance = 600
+dusk_steps = 10
+dawn_endurance = 600
+dawn_steps = 10
