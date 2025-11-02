@@ -66,7 +66,7 @@ def start_dimming(direction: str) -> None:
     # Wait for a short time in case it's currently dimming
     time.sleep(CANCEL_SLEEP_TIME)
 
-    if CoopLightCommand.DAWM.name == direction:
+    if CoopLightCommand.DAWN.name == direction:
         log(f'Starting dawn dimming')
         dim(DAWN_START_VALUE, DAWN_END_VALUE, DAWN_STEPS, DAWN_ENDURANCE)
         log(f'Successfully dawn dimmed')
@@ -84,7 +84,11 @@ def on_message(client, userdata, msg):
     payload = msg.payload.decode().upper()
     log(f'Message received with payload {payload}')
     if CoopLightCommand.has_command(payload):
+        log(f'Starting to dim')
         start_dimming(payload)
+    else:
+        log(f'Unknown payload {payload}')
+
 
 def setup_logging():
     log_handler = logging.handlers.WatchedFileHandler(cfg.get_coop_light_logging_logfile())

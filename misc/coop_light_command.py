@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 class CoopLightCommand(Enum):
     DUSK = auto()
-    DAWM = auto()
+    DAWN = auto()
 
     @classmethod
     def has_command(cls, command):
