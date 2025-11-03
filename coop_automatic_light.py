@@ -13,8 +13,8 @@ dim_cancel: bool
 CANCEL_SLEEP_TIME = 0.1
 
 DUSK_START_VALUE = 0.1
-DUSK_END_VALUE = 1.0
-DAWN_END_VALUE = 0.0
+LIGHT_ON_VALUE = 1.0
+LIGHT_OFF_VALUE = 0.0
 DAWN_START_VALUE = 0.9
 
 cfg = Config()
@@ -29,7 +29,7 @@ DAWN_STEPS = cfg.get_coop_light_dawn_steps()
 DUSK_ENDURANCE = cfg.get_coop_light_dusk_endurance()
 DUSK_STEPS = cfg.get_coop_light_dusk_steps()
 
-def dim(start: float, end: float, steps: int, endurance: int):
+def dim(start: float, end: float, steps: int, endurance: int) -> None:
     """
     Dims the light from start to end with the number of given steps length of endurance
     :param start: the start value 0|1
@@ -49,10 +49,14 @@ def dim(start: float, end: float, steps: int, endurance: int):
             current_dim_value = round(start + (end - start) * (i / steps), 2)
         else:
             current_dim_value = round(start - (start - end) * (i / steps), 2)
-        log(f'Setting dim value {current_dim_value}')
-        dim_pwm_pin.value = current_dim_value
+        set_light_value(current_dim_value)
         log(f'Keeping dim step for {step_time} seconds')
         time.sleep(step_time)
+
+def set_light_value(value: float) -> None:
+    log(f'Setting light value {value}')
+    dim_pwm_pin.value = value
+
 
 def start_dimming(direction: str) -> None:
     f"""
@@ -68,19 +72,25 @@ def start_dimming(direction: str) -> None:
 
     if CoopLightCommand.DAWN.name == direction:
         log(f'Starting dawn dimming')
-        dim(DAWN_START_VALUE, DAWN_END_VALUE, DAWN_STEPS, DAWN_ENDURANCE)
+        dim(DAWN_START_VALUE, LIGHT_OFF_VALUE, DAWN_STEPS, DAWN_ENDURANCE)
         log(f'Successfully dawn dimmed')
     elif CoopLightCommand.DUSK.name == direction:
         log(f'Starting dusk dimming')
-        dim(DUSK_START_VALUE, DUSK_END_VALUE, DUSK_STEPS, DUSK_ENDURANCE)
+        dim(DUSK_START_VALUE, LIGHT_ON_VALUE, DUSK_STEPS, DUSK_ENDURANCE)
         log(f'Successfully dusk dimmed')
+    elif CoopLightCommand.ON.name == direction:
+        log(f'Switching light ON')
+        set_light_value(1.0)
+    elif CoopLightCommand.ON.name == direction:
+        log(f'Switching light OFF')
+        set_light_value(0.0)
 
-def on_connect(client, userdata, flags, result_code, properties):
+def on_connect(client, userdata, flags, result_code, properties) -> None:
     client.subscribe(MQTT_COMMAND_TOPIC)
     client.subscribe(MQTT_COOP_LIGHT_STATE_TOPIC)
     log(f'Connected to mqtt broker and topic {MQTT_COMMAND_TOPIC}')
 
-def on_message(client, userdata, msg):
+def on_message(client, userdata, msg) -> None:
     payload = msg.payload.decode().upper()
     log(f'Message received with payload {payload}')
     if CoopLightCommand.has_command(payload):
@@ -90,7 +100,7 @@ def on_message(client, userdata, msg):
         log(f'Unknown payload {payload}')
 
 
-def setup_logging():
+def setup_logging() -> None:
     log_handler = logging.handlers.WatchedFileHandler(cfg.get_coop_light_logging_logfile())
     formatter = logging.Formatter(
         cfg.get_coop_light_logging_message_format(),
@@ -108,11 +118,11 @@ def log(message: str, *args, level: int = logging.INFO, exc=None) -> None:
     else:
         logging.log(level, message, *args)
 
-def init_pins():
+def init_pins() -> None:
     global dim_pwm_pin
     dim_pwm_pin = PWMLED(DIM_PIN)
 
-def main():
+def main() -> None:
     setup_logging()
     client = None
     global dim_cancel
