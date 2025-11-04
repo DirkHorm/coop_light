@@ -81,7 +81,7 @@ def start_dimming(direction: str) -> None:
     elif CoopLightCommand.ON.name == direction:
         log(f'Switching light ON')
         set_light_value(1.0)
-    elif CoopLightCommand.ON.name == direction:
+    elif CoopLightCommand.OFF.name == direction:
         log(f'Switching light OFF')
         set_light_value(0.0)
 
