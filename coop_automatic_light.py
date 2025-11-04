@@ -13,9 +13,9 @@ dim_cancel: bool
 CANCEL_SLEEP_TIME = 0.1
 
 DUSK_START_VALUE = 0.1
-LIGHT_ON_VALUE = 1.0
+LIGHT_ON_VALUE = 0.7
 LIGHT_OFF_VALUE = 0.0
-DAWN_START_VALUE = 0.9
+DAWN_START_VALUE = 0.6
 
 cfg = Config()
 MQTT_COMMAND_TOPIC = cfg.get_mqtt_topic_command()
